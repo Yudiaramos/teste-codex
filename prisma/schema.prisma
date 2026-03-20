@@ -1,0 +1,396 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LayoutMode {
+  shared
+  municipal_spotlight
+}
+
+enum NormLifecycleStatus {
+  vigente
+  revogada
+  alterada
+  historica
+}
+
+enum AttachmentKind {
+  pdf
+  annex
+  guide
+}
+
+enum RelationType {
+  altera
+  regulamenta
+  revoga_parcialmente
+  complementa
+}
+
+enum NormVersionKind {
+  original
+  alterada
+  consolidada
+  vigente
+}
+
+enum NormChangeType {
+  nova_redacao
+  acrescimo
+  revogacao
+  consolidacao
+  regulamentacao
+}
+
+model Tenant {
+  id               String                     @id @default(cuid())
+  slug             String                     @unique
+  name             String
+  stateCode        String
+  layoutMode       LayoutMode                 @default(shared)
+  logoUrl          String?
+  crestUrl         String?
+  heroImageUrl     String?
+  primaryColor     String?
+  secondaryColor   String?
+  accentColor      String?
+  mutedColor       String?
+  surfaceColor     String?
+  foregroundColor  String?
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
+  municipality     MunicipalityProfile?
+  roles            UserRole[]
+  normTypes        NormType[]
+  normStatuses     NormStatus[]
+  themes           NormTheme[]
+  norms            Norm[]
+  normVersions     NormVersion[]
+  normChangeEvents NormChangeEvent[]
+  featuredNorms    FeaturedNorm[]
+  searchLogs       SearchLog[]
+  favorites        FavoriteNorm[]
+  notifications    NotificationSubscription[]
+  attachments      NormAttachment[]
+  relationships    NormRelationship[]
+  auditLogs        AdminAuditLog[]
+}
+
+model MunicipalityProfile {
+  id                String   @id @default(cuid())
+  tenantId          String   @unique
+  cityName          String
+  stateCode         String
+  officialHeadline  String
+  institutionalText String
+  howToSearch       String[]
+  strategicShortcuts Json
+  homeSections      Json
+  notices           String[]
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id             String                     @id @default(cuid())
+  name           String?
+  email          String                     @unique
+  passwordHash   String?
+  emailVerified  DateTime?
+  image          String?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  roles          UserRole[]
+  favorites      FavoriteNorm[]
+  notifications  NotificationSubscription[]
+  auditLogs      AdminAuditLog[]
+}
+
+model Role {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  label       String
+  description String?
+  createdAt   DateTime   @default(now())
+  users       UserRole[]
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  tenantId  String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId, tenantId])
+}
+
+model NormType {
+  id        String   @id @default(cuid())
+  tenantId  String
+  code      String
+  label     String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  norms     Norm[]
+
+  @@unique([tenantId, code])
+}
+
+model NormStatus {
+  id          String   @id @default(cuid())
+  tenantId    String
+  code        String
+  label       String
+  description String?
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  norms       Norm[]
+
+  @@unique([tenantId, code])
+}
+
+model NormTheme {
+  id          String               @id @default(cuid())
+  tenantId    String
+  name        String
+  slug        String
+  description String?
+  popularity  Int                  @default(0)
+  tenant      Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  assignments NormThemeAssignment[]
+
+  @@unique([tenantId, slug])
+}
+
+model Norm {
+  id                    String                 @id @default(cuid())
+  tenantId              String
+  typeId                String?
+  statusId              String?
+  type                  String
+  number                String
+  year                  Int
+  fullCode              String
+  title                 String
+  summary               String
+  plainLanguageSummary  String?
+  fullText              String
+  publicationDate       DateTime?
+  effectiveDate         DateTime?
+  lifecycleStatusCode   NormLifecycleStatus   @default(vigente)
+  classification        String?
+  subject               String?
+  authorship            String?
+  initiative            String?
+  sourceUrl             String?
+  pdfUrl                String?
+  accessCount           Int                   @default(0)
+  keywords              String[]
+  changeHistory         String[]
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  tenant                Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  normType              NormType?             @relation(fields: [typeId], references: [id], onDelete: SetNull)
+  normStatus            NormStatus?           @relation(fields: [statusId], references: [id], onDelete: SetNull)
+  themeAssignments      NormThemeAssignment[]
+  attachments           NormAttachment[]
+  outgoingRelations     NormRelationship[]    @relation("SourceNorm")
+  incomingRelations     NormRelationship[]    @relation("RelatedNorm")
+  textVersions          NormVersion[]         @relation("NormTextVersions")
+  derivedVersions       NormVersion[]         @relation("VersionSourceNorm")
+  changeEvents          NormChangeEvent[]     @relation("NormChangeTarget")
+  sourceForChangeEvents NormChangeEvent[]     @relation("NormChangeSource")
+  featuredEntries       FeaturedNorm[]
+  favorites             FavoriteNorm[]
+  statusHistory         NormStatusHistory[]
+
+  @@unique([tenantId, type, number, year])
+  @@index([tenantId, year])
+  @@index([tenantId, fullCode])
+}
+
+model NormThemeAssignment {
+  id      String    @id @default(cuid())
+  normId  String
+  themeId String
+  norm    Norm      @relation(fields: [normId], references: [id], onDelete: Cascade)
+  theme   NormTheme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@unique([normId, themeId])
+}
+
+model NormAttachment {
+  id        String         @id @default(cuid())
+  tenantId  String
+  normId    String
+  title     String
+  url       String
+  kind      AttachmentKind
+  createdAt DateTime       @default(now())
+  tenant    Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  norm      Norm           @relation(fields: [normId], references: [id], onDelete: Cascade)
+}
+
+model NormRelationship {
+  id            String       @id @default(cuid())
+  tenantId      String
+  normId        String
+  relatedNormId String
+  relationType  RelationType
+  label         String?
+  createdAt     DateTime     @default(now())
+  tenant        Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  norm          Norm         @relation("SourceNorm", fields: [normId], references: [id], onDelete: Cascade)
+  relatedNorm   Norm         @relation("RelatedNorm", fields: [relatedNormId], references: [id], onDelete: Cascade)
+}
+
+model NormVersion {
+  id                   String          @id @default(cuid())
+  tenantId             String
+  normId               String
+  sourceNormId         String?
+  label                String
+  kind                 NormVersionKind
+  validFrom            DateTime
+  validTo              DateTime?
+  summary              String?
+  fullText             String          @db.Text
+  plainLanguageSummary String?         @db.Text
+  isCurrent            Boolean         @default(false)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  tenant               Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  norm                 Norm            @relation("NormTextVersions", fields: [normId], references: [id], onDelete: Cascade)
+  sourceNorm           Norm?           @relation("VersionSourceNorm", fields: [sourceNormId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, normId, validFrom])
+}
+
+model NormChangeEvent {
+  id           String         @id @default(cuid())
+  tenantId     String
+  normId       String
+  sourceNormId String?
+  changeType   NormChangeType
+  effectiveDate DateTime
+  target       String
+  summary      String
+  beforeText   String?        @db.Text
+  afterText    String?        @db.Text
+  notes        String?        @db.Text
+  order        Int            @default(0)
+  createdAt    DateTime       @default(now())
+  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  norm         Norm           @relation("NormChangeTarget", fields: [normId], references: [id], onDelete: Cascade)
+  sourceNorm   Norm?          @relation("NormChangeSource", fields: [sourceNormId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, normId, effectiveDate])
+}
+
+model NormStatusHistory {
+  id          String               @id @default(cuid())
+  normId      String
+  statusCode  NormLifecycleStatus
+  notes       String?
+  createdAt   DateTime             @default(now())
+  norm        Norm                 @relation(fields: [normId], references: [id], onDelete: Cascade)
+}
+
+model FeaturedNorm {
+  id            String   @id @default(cuid())
+  tenantId      String
+  normId        String
+  highlightText String?
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  norm          Norm     @relation(fields: [normId], references: [id], onDelete: Cascade)
+}
+
+model SearchLog {
+  id         String   @id @default(cuid())
+  tenantId    String
+  query      String
+  filters    Json?
+  createdAt  DateTime @default(now())
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model FavoriteNorm {
+  id         String   @id @default(cuid())
+  tenantId   String
+  userId     String
+  normId     String
+  createdAt  DateTime @default(now())
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  norm       Norm     @relation(fields: [normId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId, normId])
+}
+
+model NotificationSubscription {
+  id         String   @id @default(cuid())
+  tenantId   String
+  userId     String?
+  email      String
+  query      String
+  createdAt  DateTime @default(now())
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  tenantId   String?
+  userId     String?
+  action     String
+  targetType String
+  targetId   String
+  payload    Json?
+  createdAt  DateTime @default(now())
+  tenant     Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

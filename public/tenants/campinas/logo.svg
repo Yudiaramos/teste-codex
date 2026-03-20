@@ -1,0 +1,7 @@
+<svg width="320" height="84" viewBox="0 0 320 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="84" rx="24" fill="#204F8C"/>
+  <rect x="16" y="16" width="52" height="52" rx="18" fill="#DBE8F9"/>
+  <path d="M42 28L54 34V42C54 50 49 58 42 62C35 58 30 50 30 42V34L42 28Z" fill="#E3A63B"/>
+  <text x="88" y="36" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="700">Campinas-SP</text>
+  <text x="88" y="58" fill="#DBE8F9" font-family="Arial, sans-serif" font-size="13">Legislacao Digital</text>
+</svg>
