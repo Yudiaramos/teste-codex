@@ -66,8 +66,8 @@ async function main() {
             officialHeadline: bundle.tenant.profile.officialHeadline,
             institutionalText: bundle.tenant.profile.institutionalText,
             howToSearch: bundle.tenant.profile.howToSearch,
-            strategicShortcuts: bundle.tenant.profile.strategicShortcuts,
-            homeSections: bundle.tenant.profile.homeSections,
+            strategicShortcuts: JSON.parse(JSON.stringify(bundle.tenant.profile.strategicShortcuts)),
+            homeSections: JSON.parse(JSON.stringify(bundle.tenant.profile.homeSections)),
             notices: bundle.tenant.profile.notices
           }
         }

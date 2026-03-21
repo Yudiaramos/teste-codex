@@ -23,7 +23,7 @@ interface IngestionResult {
 
 export default function IngestaoPage() {
   const params = useParams();
-  const tenant = params.tenant as string;
+  const tenant = (params?.tenant as string) ?? "";
   const [rawText, setRawText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
