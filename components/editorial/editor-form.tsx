@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { RichTextEditor } from "@/components/editorial/rich-text-editor";
 
 interface EditorFormProps {
   tenantSlug: string;
@@ -169,12 +170,7 @@ export function EditorForm({ tenantSlug, normId, normCode, currentFullText }: Ed
         <p className="text-sm text-slate-500">
           Edite o texto completo da norma. Use uma linha por artigo, separados por linha em branco.
         </p>
-        <textarea
-          value={proposedText}
-          onChange={(e) => setProposedText(e.target.value)}
-          rows={20}
-          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 font-mono text-sm leading-7 focus:border-[var(--tenant-primary)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--tenant-primary)]/20"
-        />
+        <RichTextEditor content={proposedText} onChange={setProposedText} />
       </div>
 
       {/* Change events */}

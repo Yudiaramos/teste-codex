@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 import { auth } from "@/auth";
+import { Button } from "@/components/ui/button";
 import { EditorNormSelector } from "@/components/editorial/editor-norm-selector";
 import { getCurrentNormText, getNormsByTenant } from "@/server/norms/norm-service";
 
@@ -18,6 +21,13 @@ export default async function EditorPage({ params }: { params: Promise<{ tenant:
 
   return (
     <main className="page-shell py-10">
+      <Button asChild variant="ghost" size="sm" className="mb-4">
+        <Link href="/admin">
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Voltar ao painel
+        </Link>
+      </Button>
+
       <section className="mb-8 space-y-3">
         <span className="section-eyebrow">Editor Legislativo</span>
         <h1 className="text-5xl">Nova proposta de alteração</h1>

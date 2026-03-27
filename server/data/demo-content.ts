@@ -136,27 +136,27 @@ const piracicabaTenant: TenantRecord = {
       {
         title: "Lei Organica",
         description: "Estrutura institucional e principios do municipio.",
-        href: "/piracicaba-sp/resultados?type=Lei%20Organica"
+        href: "/piracicaba-sp/normas/piracicaba-lo-1"
       },
       {
         title: "Codigo Tributario",
         description: "Regras municipais de taxas, impostos e arrecadacao.",
-        href: "/piracicaba-sp/resultados?theme=tributacao"
+        href: "/piracicaba-sp/normas/piracicaba-lc-405"
       },
       {
         title: "Codigo de Posturas",
         description: "Regras de convivencia, fiscalizacao e ordenamento urbano.",
-        href: "/piracicaba-sp/resultados?theme=urbanismo"
+        href: "/piracicaba-sp/normas/piracicaba-lc-390"
       },
       {
         title: "Regimento Interno",
         description: "Normas de funcionamento da Camara e do processo legislativo.",
-        href: "/piracicaba-sp/resultados?type=Resolucao"
+        href: "/piracicaba-sp/normas/piracicaba-lo-1"
       },
       {
         title: "Estrutura Administrativa",
         description: "Organizacao dos orgaos e secretarias municipais.",
-        href: "/piracicaba-sp/resultados?theme=administracao"
+        href: "/piracicaba-sp/normas/piracicaba-decreto-19643"
       }
     ],
     homeSections: [
@@ -236,27 +236,27 @@ const campinasTenant: TenantRecord = {
       {
         title: "Lei Organica",
         description: "Base institucional e competencias do municipio.",
-        href: "/campinas-sp/resultados?type=Lei%20Organica"
+        href: "/campinas-sp/normas/campinas-lo-1"
       },
       {
         title: "Codigo Tributario",
         description: "Tributos municipais, incentivos e obrigacoes acessorias.",
-        href: "/campinas-sp/resultados?theme=tributacao"
+        href: "/campinas-sp/normas/campinas-lc-478"
       },
       {
         title: "Codigo de Posturas",
         description: "Atividades urbanas, licenciamento e fiscalizacao.",
-        href: "/campinas-sp/resultados?theme=urbanismo"
+        href: "/campinas-sp/normas/campinas-lc-478"
       },
       {
         title: "Regimento Interno",
         description: "Fluxo de deliberacao e procedimentos do Legislativo.",
-        href: "/campinas-sp/resultados?type=Resolucao"
+        href: "/campinas-sp/normas/campinas-lo-1"
       },
       {
         title: "Estrutura Administrativa",
         description: "Secretarias, competencias e governanca.",
-        href: "/campinas-sp/resultados?theme=administracao"
+        href: "/campinas-sp/normas/campinas-lo-1"
       }
     ],
     homeSections: [
