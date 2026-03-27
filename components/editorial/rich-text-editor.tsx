@@ -186,7 +186,7 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
           active={editor.isActive("blockquote")}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
         >
-          "
+          {"\u201C"}
         </Btn>
 
         {/* horizontal rule */}
